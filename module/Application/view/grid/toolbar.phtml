@@ -1,0 +1,113 @@
+<section class="content-header">
+    <h1>
+        <?php echo $heading; ?>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+        <?php
+        if (!empty($backLinkBreadCrumb)) {
+            if(is_array($backLinkBreadCrumb)){
+                foreach ($backLinkBreadCrumb as $heading=>$link){
+                    echo '<li><a href="' . $link . '">' . $heading . '</a></li>';
+                }
+            }else{
+                echo '<li><a href="' . $backLinkBreadCrumb . '">' . $heading . '</a></li>';
+            }
+        } else {
+            echo '<li><a href="#">' . $heading . '</a></li>';
+        }
+        ?>
+        <li class="active">List</li>
+    </ol>
+</section>
+
+<section class="content">
+
+    <div class="box box-success">
+        <!--                <div class="box-header with-border ">
+                            <div class="box-tools pull-right">
+                                <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div> /.box-header </h3>-->
+        <div class="box-body " >
+            <?php
+            $url = $this->url(null, array(), array(), true);
+            ?>
+            <!-- Actions (add, ...) -->
+            <div class="col-md-2 ">
+                <?php if (!isset($add)) : ?>
+                    <a class = "btn btn-success" href = "<?php echo $url . '/add'; ?>" >Add</a>
+                <?php elseif (isset($add) && $add !== false) : ?>
+                    <a class = "btn btn-success" href = "<?php echo $add; ?>" >Add</a>
+                <?php else : ?>
+                <?php endif; ?>
+            </div>
+
+            <!-- Anything else (filter, ...) -->
+            <div class="col-md-6">
+                <?php
+                if (isset($filterToolbar)) {
+                    echo $this->partial($filterToolbar);
+                }
+                ?>
+            </div>
+
+            <!-- Export buttons -->
+            <div class="col-md-2">
+                <?php
+                if ($this->overwriteUrl != '') {
+                    $url = $this->overwriteUrl;
+                }
+
+                $parametersAdd = '';
+                foreach ($this->parameters as $name => $value) {
+                    $parametersAdd .= '&' . $name . '=' . $value;
+                }
+                if (isset($enableExport) && $enableExport === true) :
+
+                    foreach ($this->exportRenderers as $type => $name) {
+                        $urlExport = $url . '?' . $this->generalParameterNames['rendererType'] . '=' . $type . $parametersAdd;
+                        ?>
+                        <a class="btn btn-success" href="<?php echo $urlExport; ?>">
+                            <?php echo $name; ?>
+                        </a>
+
+                        <?php
+                    } endif;
+                ?>    
+            </div>
+
+
+
+        </div>
+        <?php
+        if (isset($toolbarPartials)) :
+            foreach ($toolbarPartials as $key => $partial) :
+                echo $this->partial($key, $partial);
+            endforeach;
+        endif;
+        ?>
+        <?php
+        $action = $this->layout()->getVariable('action');
+        $currentPath = parse_url($this->serverUrl(true), PHP_URL_PATH);
+        if (isset($action) && in_array($action, array('index', 'bank-instruction','dealer','cars-booked-history','transactions','holiday'))):
+            ?>
+            <div class="row"><div class="col-md-2 pull-right"><a href="/clear-filter/?filterPath=<?php echo $currentPath ?>" class="btn btn-info">Clear Filter</a></div></div>
+        <?php endif; ?>
+<?php
+$this->headScript()->appendFile($this->basePath('js/AutoNumeric.js'));
+$this->inlineScript()->captureStart();
+echo <<<JS
+////todo::check if window.load can be removed
+//$(window).load(function(){
+//    var _options = {
+//        'dGroup': 2,
+//        'aPad': false,
+//        'vMin':-9999999999,
+//        'vMax':9999999999
+//    };
+//    $(".formatAmount").AutoNumeric(_options);
+//});
+
+JS;
+$this->inlineScript()->captureEnd();
